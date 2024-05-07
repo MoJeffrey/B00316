@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-PHP-exam>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <style type="text/css">
+    #text-button {
+      display: block;
+      cursor: pointer;
+      width: 160px;
+      text-align: center;
+      border: 1px solid #232323;
+      color: blue;
+    }
+  </style>
+  <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<title>投票系统（防刷票）</title>
+</head>
+
+<body>
+<form id="form1" name="form1" method="post" action="" style="width: 500px;margin: auto;">
+  <h1 style="margin-bottom: 20px">你觉得2020年谁最优秀？</h1>
+  <div>
+    {% for item in data %}
+    <label style="display: flex;">
+      <input type="radio" name="dxz" value="{{ item.name }}" id="{{ item.id }}" onclick="ChangeVote('{{ item.id }}')"/>
+      <div style="display: flex;justify-content: space-between;width: 300px">
+        <div class="candidate">
+          {{ item.name }}
+        </div>
+        <div>
+          现在票数：
+          <div class="votesNum">{{ item.Num }}</div>
+        </div>
+      </div>
+
+    </label>
+    <br />
+    {% endfor %}
+  </div>
+  <div id="text-button"><p id="text">投他一票</p></div>
+</form>
+</body>
+
+<script stype=text/javascript>
+  let voteId = null;
+
+  function ChangeVote(Id){
+    voteId = Id;
+    console.log(voteId);
+  }
+
+  function post(URL, PARAMS) {
+    var temp = document.createElement("form");
+    temp.action = URL;
+    temp.method = "post";
+    temp.style.display = "none";
+    for (var x in PARAMS) {
+    var opt = document.createElement("textarea");
+    opt.name = x;
+    opt.value = PARAMS[x];
+    // alert(opt.name)
+    temp.appendChild(opt);
+    }
+    document.body.appendChild(temp);
+    temp.submit();
+    return temp;
+  }
+
+  document.getElementById("text-button").onclick = function() {
+    if (! voteId) {
+      alert('请选择你要投选的对象！');
+      return false;
+    }
+
+    const data = {
+      id: voteId
+    };
+
+    $.ajax({
+        url: "./vote",
+        data: JSON.stringify(data),
+        method: "post",
+        dataType: "json",
+        contentType: 'application/json',
+        success: function (data) {
+          if(data.msg === 'ok'){
+            alert('投票成功！');
+            window.location.reload();
+          }else {
+            alert(data.msg);
+            window.location.reload();
+          }
+        }
+    });
+  };
+
+</script>
+
+</html>
